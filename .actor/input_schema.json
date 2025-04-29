@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://scrapeless.com/captcha/turnstile.schema.json",
+  "title": "test",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "name": {
+      "title": "name",
+      "description": "name",
+      "type": "string",
+      "default": "Tom"
+    }
+  },
+  "required": ["name"]
+}
