@@ -10,7 +10,16 @@
       "description": "name",
       "type": "string",
       "default": "Tom"
+    },
+    "url": {
+      "title": "url",
+      "description": "url",
+      "type": "string",
+      "default": "www.scrapeless.com"
     }
   },
-  "required": ["name"]
+  "required": [
+    "name",
+    "url"
+  ]
 }
