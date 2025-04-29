@@ -43,5 +43,9 @@ func main() {
 		panic(err)
 	}
 	log.Println("Dataset AddItems,", put)
+	for {
+		log.Println(time.Now().Format(time.DateTime))
+		time.Sleep(time.Second)
+	}
 
 }
