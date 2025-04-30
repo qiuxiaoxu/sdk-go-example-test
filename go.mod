@@ -2,7 +2,7 @@ module sdk-go-example-test
 
 go 1.24.0
 
-require github.com/scrapeless-ai/scrapeless-actor-sdk-go v0.0.7
+require github.com/scrapeless-ai/scrapeless-actor-sdk-go v0.0.9
 
 require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
