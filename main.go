@@ -26,7 +26,6 @@ func main() {
 		return
 	}
 
-	// 模拟向队Dataset添加数据
 	for i := 0; i < 30; i++ {
 		items := []map[string]any{
 			{
@@ -51,7 +50,6 @@ func main() {
 	}
 	log.Info("add items success")
 
-	// 模拟向KV添加数据
 	for i := 0; i < 30; i++ {
 		_, err := actor.Storage.GetKv().SetValue(
 			context.Background(),
@@ -71,13 +69,11 @@ func main() {
 	}
 	log.Println("Dataset AddItems,", put)
 	for {
-		// 模拟运行，每秒钟随机输出一些运行日志
 		randLog()
 		time.Sleep(time.Second)
 	}
 }
 
-// randLog 随机输出一些运行日志
 func randLog() {
 	logLevel := 0
 	logLevel = rand.Intn(5)
