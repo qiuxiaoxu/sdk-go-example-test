@@ -6,6 +6,7 @@ import (
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless"
 	log "github.com/sirupsen/logrus"
 	"math/rand"
+	"net/http"
 	"time"
 )
 
@@ -17,15 +18,31 @@ type RequestParam struct {
 	Name string `json:"name"`
 }
 
+var (
+	actor *scrapeless.Actor
+)
+
 func main() {
-	actor := scrapeless.New(scrapeless.WithStorage())
+	actor = scrapeless.New(scrapeless.WithStorage(), scrapeless.WithServer())
 	defer actor.Close()
 	var param = &RequestParam{}
 	if err := actor.Input(param); err != nil {
 		log.Error(err)
 		return
 	}
+	actor.Server.AddHandle(http.MethodGet, "/test", new(RequestParam), test)
+	go actor.Start()
+	for {
+		randLog()
+		time.Sleep(time.Second)
+	}
+}
 
+func test(t any) (any, error) {
+	param, ok := t.(*RequestParam)
+	if !ok {
+		return nil, fmt.Errorf("param is not RequestParam")
+	}
 	for i := 0; i < 30; i++ {
 		items := []map[string]any{
 			{
@@ -68,10 +85,7 @@ func main() {
 		panic(err)
 	}
 	log.Println("Dataset AddItems,", put)
-	for {
-		randLog()
-		time.Sleep(time.Second)
-	}
+	return "success", nil
 }
 
 func randLog() {
