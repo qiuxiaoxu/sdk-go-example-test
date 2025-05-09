@@ -2,12 +2,13 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless"
+	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/httpserver"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
 	log "github.com/sirupsen/logrus"
 	"math/rand"
-	"net/http"
 	"time"
 )
 
@@ -37,7 +38,7 @@ func main() {
 			Payload: []byte(fmt.Sprintf(`{"name":"%s-%d"}`, param.Name, i)),
 		})
 	}
-	actor.Server.AddHandle(http.MethodGet, "/test", new(RequestParam), test)
+	actor.Server.AddHandle("/test", test)
 	go actor.Start()
 	for {
 		randLog()
@@ -45,11 +46,9 @@ func main() {
 	}
 }
 
-func test(t any) (any, error) {
-	param, ok := t.(*RequestParam)
-	if !ok {
-		return nil, fmt.Errorf("param is not RequestParam")
-	}
+func test(t []byte) (httpserver.Response, error) {
+	var param = &RequestParam{}
+	json.Unmarshal(t, param)
 	for i := 0; i < 30; i++ {
 		items := []map[string]any{
 			{
@@ -92,7 +91,11 @@ func test(t any) (any, error) {
 		panic(err)
 	}
 	log.Println("Dataset AddItems,", put)
-	return "success", nil
+	return httpserver.Response{
+		Code: 0,
+		Data: "success",
+		Msg:  "success",
+	}, nil
 }
 
 func randLog() {
