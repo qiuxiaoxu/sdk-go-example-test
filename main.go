@@ -37,7 +37,12 @@ func main() {
 			Name:    fmt.Sprintf("test-%d", i),
 			Payload: []byte(fmt.Sprintf(`{"name":"%s-%d"}`, param.Name, i)),
 		})
-		log.Infoln("msgId:", msgId)
+		get, err := actor.Storage.GetObject().Get(context.Background(), msgId)
+		if err != nil {
+			log.Error(err)
+			return
+		}
+		log.Infof("get masid %s,msg:%s\n", msgId, string(get))
 	}
 	test([]byte(`{"name":"test"}`))
 	actor.Server.AddHandle("/test", test)
@@ -66,11 +71,16 @@ func test(t []byte) (httpserver.Response, error) {
 				"time": time.Now().Unix(),
 			},
 		}
-		log.Debugf("add items: %+v", items)
+		log.Infof("add items: %+v", items)
 		_, err := actor.Storage.GetDataset().AddItems(context.Background(), items)
 		if err != nil {
 			log.Error(err)
 		}
+		getItems, err := actor.Storage.GetDataset().GetItems(context.Background(), 1, 10, false)
+		if err != nil {
+			log.Error(err)
+		}
+		log.Infof("get items: %+v", getItems)
 		time.Sleep(time.Second)
 	}
 	log.Info("add items success")
@@ -84,15 +94,24 @@ func test(t []byte) (httpserver.Response, error) {
 		if err != nil {
 			log.Error("set value err:", err)
 		}
+		value, err := actor.Storage.GetKv().GetValue(context.Background(), fmt.Sprintf("key-%d", i))
+		if err != nil {
+			log.Error("get value err:", err)
+		}
+		log.Infof("get value: %s", value)
 		time.Sleep(time.Second)
 	}
 
 	log.Infof("add items success")
-	put, err := actor.Storage.GetObject().Put(context.Background(), "key.json", []byte(fmt.Sprintf(`{"name":"%s"}`, param.Name)))
-	if err != nil {
-		panic(err)
-	}
-	log.Println("Dataset AddItems,", put)
+	//put, err := actor.Storage.GetObject().Put(context.Background(), "key.json", []byte(fmt.Sprintf(`{"name":"%s"}`, param.Name)))
+	//if err != nil {
+	//	panic(err)
+	//}
+	//get, err := actor.Storage.GetObject().Get(context.Background(), put)
+	//if err != nil {
+	//
+	//}
+	//log.Println("Dataset AddItems,", put)
 	return httpserver.Response{
 		Code: 0,
 		Data: "success",
