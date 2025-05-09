@@ -3,7 +3,7 @@ module sdk-go-example-test
 go 1.24.0
 
 require (
-	github.com/scrapeless-ai/scrapeless-actor-sdk-go v0.2.0
+	github.com/scrapeless-ai/scrapeless-actor-sdk-go v0.2.1
 	github.com/sirupsen/logrus v1.9.3
 )
 
