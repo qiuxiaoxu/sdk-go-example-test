@@ -101,8 +101,7 @@ func test(t []byte) (httpserver.Response, error) {
 		log.Infof("get value: %s", value)
 		time.Sleep(time.Second)
 	}
-
-	log.Infof("add items success")
+	log.Infof("add items success !")
 	//put, err := actor.Storage.GetObject().Put(context.Background(), "key.json", []byte(fmt.Sprintf(`{"name":"%s"}`, param.Name)))
 	//if err != nil {
 	//	panic(err)
