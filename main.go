@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless"
+	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
 	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"net/http"
@@ -29,6 +30,12 @@ func main() {
 	if err := actor.Input(param); err != nil {
 		log.Error(err)
 		return
+	}
+	for i := 0; i < 10; i++ {
+		actor.Storage.GetQueue().Push(context.Background(), queue.PushQueue{
+			Name:    fmt.Sprintf("test-%d", i),
+			Payload: []byte(fmt.Sprintf(`{"name":"%s-%d"}`, param.Name, i)),
+		})
 	}
 	actor.Server.AddHandle(http.MethodGet, "/test", new(RequestParam), test)
 	go actor.Start()
