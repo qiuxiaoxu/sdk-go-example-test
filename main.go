@@ -33,11 +33,13 @@ func main() {
 		return
 	}
 	for i := 0; i < 10; i++ {
-		actor.Storage.GetQueue().Push(context.Background(), queue.PushQueue{
+		msgId, _ := actor.Storage.GetQueue().Push(context.Background(), queue.PushQueue{
 			Name:    fmt.Sprintf("test-%d", i),
 			Payload: []byte(fmt.Sprintf(`{"name":"%s-%d"}`, param.Name, i)),
 		})
+		log.Infoln("msgId:", msgId)
 	}
+	test([]byte(`{"name":"test"}`))
 	actor.Server.AddHandle("/test", test)
 	go actor.Start()
 	for {
