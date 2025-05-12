@@ -34,10 +34,13 @@ func main() {
 	}
 	test([]byte(`{"name":"test"}`))
 	for i := 0; i < 10; i++ {
-		msgId, _ := actor.Storage.GetQueue().Push(context.Background(), queue.PushQueue{
+		msgId, err := actor.Storage.GetQueue().Push(context.Background(), queue.PushQueue{
 			Name:    fmt.Sprintf("%d", i),
 			Payload: []byte(fmt.Sprintf(`{"name":"%s-%d"}`, param.Name, i)),
 		})
+		if err != nil {
+			log.Error(err)
+		}
 		log.Infoln("push msgId:%s", msgId)
 
 		get, err := actor.Storage.GetQueue().Get(context.Background(), fmt.Sprintf("%d", i))
