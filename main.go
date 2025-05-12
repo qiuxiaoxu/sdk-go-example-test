@@ -41,13 +41,12 @@ func main() {
 		if err != nil {
 			log.Error(err)
 		}
-		log.Infoln("push msgId:%s", msgId)
-
-		get, err := actor.Storage.GetQueue().Get(context.Background(), fmt.Sprintf("%d", i))
+		log.Infof("push msgId:%s\n", msgId)
+		pullResp, err := actor.Storage.GetQueue().Pull(context.Background(), 1)
 		if err != nil {
 			log.Error(err)
 		}
-		log.Infof("get masid %s,msg:%+v\n", msgId, get)
+		log.Infof("get msgId %s,msg:%+v\n", pullResp[0].ID, pullResp)
 		err = actor.Storage.GetQueue().Ack(context.Background(), msgId)
 		if err != nil {
 			log.Error(err)
