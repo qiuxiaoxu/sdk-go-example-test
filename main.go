@@ -32,6 +32,7 @@ func main() {
 		log.Error(err)
 		return
 	}
+	test([]byte(`{"name":"test"}`))
 	for i := 0; i < 10; i++ {
 		msgId, _ := actor.Storage.GetQueue().Push(context.Background(), queue.PushQueue{
 			Name:    fmt.Sprintf("test-%d", i),
@@ -44,7 +45,6 @@ func main() {
 		}
 		log.Infof("get masid %s,msg:%s\n", msgId, string(get))
 	}
-	test([]byte(`{"name":"test"}`))
 	actor.Server.AddHandle("/test", test)
 	go actor.Start()
 	for {
