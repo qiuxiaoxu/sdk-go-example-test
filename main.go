@@ -38,12 +38,12 @@ func main() {
 			Name:    fmt.Sprintf("test-%d", i),
 			Payload: []byte(fmt.Sprintf(`{"name":"%s-%d"}`, param.Name, i)),
 		})
-		get, err := actor.Storage.GetObject().Get(context.Background(), msgId)
+		get, err := actor.Storage.GetQueue().Get(context.Background(), msgId)
 		if err != nil {
 			log.Error(err)
 			return
 		}
-		log.Infof("get masid %s,msg:%s\n", msgId, string(get))
+		log.Infof("get masid %s,msg:%+v\n", msgId, get)
 	}
 	actor.Server.AddHandle("/test", test)
 	go actor.Start()
@@ -56,7 +56,7 @@ func main() {
 func test(t []byte) (httpserver.Response, error) {
 	var param = &RequestParam{}
 	json.Unmarshal(t, param)
-	for i := 0; i < 30; i++ {
+	for i := 0; i < 5; i++ {
 		items := []map[string]any{
 			{
 				"name": fmt.Sprintf("name-%d", i),
@@ -85,7 +85,7 @@ func test(t []byte) (httpserver.Response, error) {
 	}
 	log.Info("add items success")
 
-	for i := 0; i < 30; i++ {
+	for i := 0; i < 5; i++ {
 		_, err := actor.Storage.GetKv().SetValue(
 			context.Background(),
 			fmt.Sprintf("key-%d", i),
