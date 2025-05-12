@@ -35,15 +35,21 @@ func main() {
 	test([]byte(`{"name":"test"}`))
 	for i := 0; i < 10; i++ {
 		msgId, _ := actor.Storage.GetQueue().Push(context.Background(), queue.PushQueue{
-			Name:    fmt.Sprintf("test-%d", i),
+			Name:    fmt.Sprintf("%d", i),
 			Payload: []byte(fmt.Sprintf(`{"name":"%s-%d"}`, param.Name, i)),
 		})
-		get, err := actor.Storage.GetQueue().Get(context.Background(), msgId)
+		log.Infoln("push msgId:%s", msgId)
+
+		get, err := actor.Storage.GetQueue().Get(context.Background(), fmt.Sprintf("%d", i))
 		if err != nil {
 			log.Error(err)
-			return
 		}
 		log.Infof("get masid %s,msg:%+v\n", msgId, get)
+		err = actor.Storage.GetQueue().Ack(context.Background(), msgId)
+		if err != nil {
+			log.Error(err)
+		}
+		log.Infof("ack msgId:%s\n", msgId)
 	}
 	actor.Server.AddHandle("/test", test)
 	go actor.Start()
