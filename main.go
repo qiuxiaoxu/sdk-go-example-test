@@ -6,15 +6,11 @@ import (
 	"fmt"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/httpserver"
+	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/log"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
-	log "github.com/sirupsen/logrus"
 	"math/rand"
 	"time"
 )
-
-func init() {
-	log.SetFormatter(&log.TextFormatter{})
-}
 
 type RequestParam struct {
 	Name string `json:"name"`
@@ -29,7 +25,7 @@ func main() {
 	defer actor.Close()
 	var param = &RequestParam{}
 	if err := actor.Input(param); err != nil {
-		log.Error(err)
+		log.GetLogger().Error().Msg(err.Error())
 		return
 	}
 	test([]byte(`{"name":"test"}`))
@@ -39,19 +35,19 @@ func main() {
 			Payload: []byte(fmt.Sprintf(`{"name":"%s-%d"}`, param.Name, i)),
 		})
 		if err != nil {
-			log.Error(err)
+			log.GetLogger().Error().Msg(err.Error())
 		}
-		log.Infof("push msgId:%s\n", msgId)
+		log.GetLogger().Info().Msgf("push msgId:%s\n", msgId)
 		pullResp, err := actor.Storage.GetQueue().Pull(context.Background(), 1)
 		if err != nil {
-			log.Error(err)
+			log.GetLogger().Error().Msg(err.Error())
 		}
-		log.Infof("get msgId %s,msg:%+v\n", pullResp[0].ID, pullResp)
+		log.GetLogger().Info().Msgf("get msgId %s,msg:%+v\n", pullResp[0].ID, pullResp)
 		err = actor.Storage.GetQueue().Ack(context.Background(), msgId)
 		if err != nil {
-			log.Error(err)
+			log.GetLogger().Error().Msg(err.Error())
 		}
-		log.Infof("ack msgId:%s\n", msgId)
+		log.GetLogger().Info().Msgf("ack msgId:%s\n", msgId)
 	}
 	actor.Server.AddHandle("/test", test)
 	go actor.Start()
@@ -79,19 +75,19 @@ func test(t []byte) (httpserver.Response, error) {
 				"time": time.Now().Unix(),
 			},
 		}
-		log.Infof("add items: %+v", items)
+		log.GetLogger().Info().Msgf("add items: %+v\n", items)
 		_, err := actor.Storage.GetDataset().AddItems(context.Background(), items)
 		if err != nil {
-			log.Error(err)
+			log.GetLogger().Error().Msg(err.Error())
 		}
 		getItems, err := actor.Storage.GetDataset().GetItems(context.Background(), 1, 10, false)
 		if err != nil {
-			log.Error(err)
+			log.GetLogger().Error().Msg(err.Error())
 		}
-		log.Infof("get items: %+v", getItems)
+		log.GetLogger().Info().Msgf("get items: %+v\n", getItems)
 		time.Sleep(time.Second)
 	}
-	log.Info("add items success")
+	log.GetLogger().Info().Msg("add items success")
 
 	for i := 0; i < 5; i++ {
 		_, err := actor.Storage.GetKv().SetValue(
@@ -100,16 +96,16 @@ func test(t []byte) (httpserver.Response, error) {
 			fmt.Sprintf("value-%d", i),
 			0)
 		if err != nil {
-			log.Error("set value err:", err)
+			log.GetLogger().Error().Msgf("set value err:%v\n", err)
 		}
 		value, err := actor.Storage.GetKv().GetValue(context.Background(), fmt.Sprintf("key-%d", i))
 		if err != nil {
-			log.Error("get value err:", err)
+			log.GetLogger().Error().Msgf("get value err:%v\n", err)
 		}
-		log.Infof("get value: %s", value)
+		log.GetLogger().Info().Msgf("get value: %s\n", value)
 		time.Sleep(time.Second)
 	}
-	log.Infof("add items success !")
+	log.GetLogger().Info().Msg("add items success !")
 	//put, err := actor.Storage.GetObject().Put(context.Background(), "key.json", []byte(fmt.Sprintf(`{"name":"%s"}`, param.Name)))
 	//if err != nil {
 	//	panic(err)
@@ -132,21 +128,21 @@ func randLog() {
 	switch logLevel {
 	case 0:
 		// 模拟输出Trace级别日志
-		log.Trace("This is a trace log")
+		log.GetLogger().Trace().Msg("This is a trace log")
 	case 1:
 		// 模拟输出Debug级别日志
-		log.Debug("This is a debug log")
+		log.GetLogger().Debug().Msg("This is a debug log")
 	case 2:
 		// 模拟输出Info级别日志
-		log.Info("This is an info log")
+		log.GetLogger().Log().Msg("This is an info log")
 	case 3:
 		// 模拟输出Warn级别日志
-		log.Warn("This is a warning log")
+		log.GetLogger().Warn().Msg("This is a warning log")
 	case 4:
 		// 模拟输出Error级别日志
-		log.Error("This is an error log")
+		log.GetLogger().Error().Msg("This is an error log")
 	default:
 		// 模拟输出Info级别日志
-		log.Info("This is an info log")
+		log.GetLogger().Info().Msg("This is an info log")
 	}
 }

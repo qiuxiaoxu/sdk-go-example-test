@@ -4,6 +4,20 @@
   "title": "test",
   "type": "object",
   "schemaVersion": 1,
+  "groups": [
+    {
+      "keys": [
+        "name"
+      ],
+      "name": "Base Options"
+    },
+    {
+      "keys": [
+        "url"
+      ],
+      "name": "url Options"
+    }
+  ],
   "properties": {
     "name": {
       "title": "name",
