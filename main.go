@@ -14,7 +14,8 @@ import (
 )
 
 type RequestParam struct {
-	Name string `json:"name"`
+	Name    string `json:"name"`
+	Keyword string `json:"keyword"`
 }
 
 var (
@@ -51,7 +52,7 @@ func main() {
 		log.GetLogger().Info().Msgf("ack msgId:%s\n", msgId)
 	}
 	actor.Server.AddHandle("/test", test)
-	data, err := actor.Router.Request("d06661fc-a014-4632-90f4-876e62e6a464", http.MethodGet, "/hello", nil, nil)
+	data, err := actor.Router.Request(param.Keyword, http.MethodGet, "/hello", nil, nil)
 	if err != nil {
 		log.GetLogger().Error().Msg(err.Error())
 	}

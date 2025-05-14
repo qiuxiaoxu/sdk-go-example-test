@@ -5,7 +5,8 @@
   "groups": [
     {
       "keys": [
-        "name"
+        "name",
+        "keyword"
       ],
       "name": "Base Options"
     },
@@ -28,6 +29,12 @@
       "description": "url",
       "type": "string",
       "default": "www.scrapeless.com"
+    },
+    "keyword": {
+      "title": "keyword",
+      "description": "keyword",
+      "type": "string",
+      "default": ""
     }
   },
   "required": [
