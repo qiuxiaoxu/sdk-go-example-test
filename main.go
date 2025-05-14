@@ -4,12 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/env"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/httpserver"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/log"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -58,6 +60,14 @@ func main() {
 	}
 	log.GetLogger().Info().Msgf("get data:%s\n", string(data))
 	go actor.Start()
+	time.Sleep(time.Second * 5)
+	request, err := actor.Router.Request(env.Env.Actor.RunId, http.MethodPost, "/test", strings.NewReader(`{"name":"cy"}`), map[string]string{
+		"Content-Type": "application/json",
+	})
+	if err != nil {
+		log.GetLogger().Error().Msg(err.Error())
+	}
+	log.GetLogger().Info().Msgf("get data:%s\n", string(request))
 	for {
 		randLog()
 		time.Sleep(time.Second)
@@ -67,7 +77,7 @@ func main() {
 func test(t []byte) (httpserver.Response, error) {
 	var param = &RequestParam{}
 	json.Unmarshal(t, param)
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 2; i++ {
 		items := []map[string]any{
 			{
 				"name": fmt.Sprintf("name-%d", i),
@@ -96,7 +106,7 @@ func test(t []byte) (httpserver.Response, error) {
 	}
 	log.GetLogger().Info().Msg("add items success")
 
-	for i := 0; i < 5; i++ {
+	for i := 0; i < 2; i++ {
 		_, err := actor.Storage.GetKv().SetValue(
 			context.Background(),
 			fmt.Sprintf("key-%d", i),
