@@ -59,8 +59,13 @@ func main() {
 		log.GetLogger().Error().Msg(err.Error())
 	}
 	log.GetLogger().Info().Msgf("get data:%s\n", string(data))
-	go actor.Start()
-	time.Sleep(time.Second * 5)
+	go func() {
+		if err := actor.Start(); err != nil {
+			log.GetLogger().Error().Msg(err.Error())
+		}
+		log.GetLogger().Info().Msgf("actor start success at port : %s", env.Env.Actor.HttpPort)
+	}()
+	time.Sleep(time.Second * 10)
 	request, err := actor.Router.Request(env.Env.Actor.RunId, http.MethodPost, "/test", strings.NewReader(`{"name":"cy"}`), map[string]string{
 		"Content-Type": "application/json",
 	})
