@@ -9,6 +9,7 @@ import (
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/log"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
 	"math/rand"
+	"net/http"
 	"time"
 )
 
@@ -50,6 +51,11 @@ func main() {
 		log.GetLogger().Info().Msgf("ack msgId:%s\n", msgId)
 	}
 	actor.Server.AddHandle("/test", test)
+	data, err := actor.Router.Request("afb393fc-f82c-47ad-84b3-f3bea8efc726", http.MethodGet, "/hello", nil, nil)
+	if err != nil {
+		log.GetLogger().Error().Msg(err.Error())
+	}
+	log.GetLogger().Info().Msgf("get data:%s\n", string(data))
 	go actor.Start()
 	for {
 		randLog()
@@ -134,7 +140,7 @@ func randLog() {
 		log.GetLogger().Debug().Msg("This is a debug log")
 	case 2:
 		// 模拟输出Info级别日志
-		log.GetLogger().Log().Msg("This is an info log")
+		log.GetLogger().Info().Msg("This is an info log")
 	case 3:
 		// 模拟输出Warn级别日志
 		log.GetLogger().Warn().Msg("This is a warning log")
