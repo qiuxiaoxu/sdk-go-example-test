@@ -10,5 +10,6 @@ FROM alpine:3.21
 RUN apk add --no-cache ca-certificates
 WORKDIR /app
 COPY --from=builder /workspace/goapp .
+USER 65530
 EXPOSE 8848
 ENTRYPOINT ["./goapp"]
