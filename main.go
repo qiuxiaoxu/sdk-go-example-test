@@ -11,6 +11,7 @@ import (
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
 	"math/rand"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 )
@@ -25,12 +26,21 @@ var (
 )
 
 func main() {
+	_, err := os.Create("/var/scrapeless/9a87fbdc-759f-489b-9173-2f0bf32b159b/1.txt")
+	if err != nil {
+		log.Error(err.Error())
+	}
+
 	actor = scrapeless.New(scrapeless.WithStorage(), scrapeless.WithServer())
 	defer actor.Close()
 	var param = &RequestParam{}
 	if err := actor.Input(param); err != nil {
 		log.Error(err.Error())
 		return
+	}
+	_, err = os.Create(fmt.Sprintf("/var/scrapeless/%s/1.txt", env.Env.Actor.RunId))
+	if err != nil {
+		log.Error(err.Error())
 	}
 	test([]byte(`{"name":"test"}`))
 	for i := 0; i < 10; i++ {
