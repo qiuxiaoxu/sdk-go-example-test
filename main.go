@@ -4,15 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/env"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/httpserver"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/log"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
 	"math/rand"
-	"net/http"
-	"os"
-	"strings"
 	"time"
 )
 
@@ -26,10 +22,6 @@ var (
 )
 
 func main() {
-	_, err := os.Create("/var/scrapeless/9a87fbdc-759f-489b-9173-2f0bf32b159b/1.txt")
-	if err != nil {
-		log.Error(err.Error())
-	}
 
 	actor = scrapeless.New(scrapeless.WithStorage(), scrapeless.WithServer())
 	defer actor.Close()
@@ -37,10 +29,6 @@ func main() {
 	if err := actor.Input(param); err != nil {
 		log.Error(err.Error())
 		return
-	}
-	_, err = os.Create(fmt.Sprintf("/var/scrapeless/%s/1.txt", env.Env.Actor.RunId))
-	if err != nil {
-		log.Error(err.Error())
 	}
 	test([]byte(`{"name":"test"}`))
 	for i := 0; i < 10; i++ {
@@ -63,30 +51,31 @@ func main() {
 		}
 		log.Infof("ack msgId:%s", msgId)
 	}
-	actor.Server.AddHandle("/test", test)
-	data, err := actor.Router.Request(param.Keyword, http.MethodGet, "/hello", nil, nil)
-	if err != nil {
-		log.Error(err.Error())
-	}
-	log.Infof("get data:%s", string(data))
-	go func() {
-		if err := actor.Start(); err != nil {
-			log.Error(err.Error())
-		}
-		log.Infof("actor start success at port : %s", env.Env.Actor.HttpPort)
-	}()
-	time.Sleep(time.Second * 10)
-	request, err := actor.Router.Request(env.Env.Actor.RunId, http.MethodPost, "/test", strings.NewReader(`{"name":"cy"}`), map[string]string{
-		"Content-Type": "application/json",
-	})
-	if err != nil {
-		log.Error(err.Error())
-	}
-	log.Infof("get data:%s", string(request))
-	for {
+	//actor.Server.AddHandle("/test", test)
+	//data, err := actor.Router.Request(param.Keyword, http.MethodGet, "/hello", nil, nil)
+	//if err != nil {
+	//	log.Error(err.Error())
+	//}
+	//log.Infof("get data:%s", string(data))
+	//go func() {
+	//	if err := actor.Start(); err != nil {
+	//		log.Error(err.Error())
+	//	}
+	//	log.Infof("actor start success at port : %s", env.Env.Actor.HttpPort)
+	//}()
+	//time.Sleep(time.Second * 10)
+	//request, err := actor.Router.Request(env.Env.Actor.RunId, http.MethodPost, "/test", strings.NewReader(`{"name":"cy"}`), map[string]string{
+	//	"Content-Type": "application/json",
+	//})
+	//if err != nil {
+	//	log.Error(err.Error())
+	//}
+	//log.Infof("get data:%s", string(request))
+	for i := 0; i < 10; i++ {
 		randLog()
 		time.Sleep(time.Second)
 	}
+
 }
 
 func test(t []byte) (httpserver.Response, error) {
