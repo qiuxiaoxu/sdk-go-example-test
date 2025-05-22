@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless"
+	scrapeless "github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/actor"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/httpserver"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/log"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
@@ -22,7 +22,7 @@ var (
 )
 
 func main() {
-
+	actor = scrapeless.New(scrapeless.WithStorage(), scrapeless.WithServer())
 	actor = scrapeless.New(scrapeless.WithStorage(), scrapeless.WithServer())
 	defer actor.Close()
 	var param = &RequestParam{}
