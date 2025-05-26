@@ -4,11 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/env"
 	scrapeless "github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/actor"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/httpserver"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/log"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
 	"math/rand"
+	"net/http"
+	"strings"
 	"time"
 )
 
@@ -51,26 +54,35 @@ func main() {
 		}
 		log.Infof("ack msgId:%s", msgId)
 	}
-	//actor.Server.AddHandle("/test", test)
-	//data, err := actor.Router.Request(param.Keyword, http.MethodGet, "/hello", nil, nil)
-	//if err != nil {
-	//	log.Error(err.Error())
-	//}
-	//log.Infof("get data:%s", string(data))
-	//go func() {
-	//	if err := actor.Start(); err != nil {
-	//		log.Error(err.Error())
-	//	}
-	//	log.Infof("actor start success at port : %s", env.Env.Actor.HttpPort)
-	//}()
-	//time.Sleep(time.Second * 10)
-	//request, err := actor.Router.Request(env.Env.Actor.RunId, http.MethodPost, "/test", strings.NewReader(`{"name":"cy"}`), map[string]string{
-	//	"Content-Type": "application/json",
-	//})
-	//if err != nil {
-	//	log.Error(err.Error())
-	//}
-	//log.Infof("get data:%s", string(request))
+	actor.Server.AddHandlePost("/test", test)
+	actor.Server.AddHandleGet("/test", func(input []byte) (httpserver.Response, error) {
+		var paramMapping = make(map[string]string)
+		json.Unmarshal(input, &paramMapping)
+		return httpserver.Response{
+			Code: 0,
+			Data: paramMapping,
+			Msg:  "success",
+		}, nil
+	})
+	data, err := actor.Router.Request(param.Keyword, http.MethodGet, "/hello", nil, nil)
+	if err != nil {
+		log.Error(err.Error())
+	}
+	log.Infof("get data:%s", string(data))
+	go func() {
+		if err := actor.Start(); err != nil {
+			log.Error(err.Error())
+		}
+		log.Infof("actor start success at port : %s", env.Env.Actor.HttpPort)
+	}()
+	time.Sleep(time.Second * 10)
+	request, err := actor.Router.Request(env.Env.Actor.RunId, http.MethodPost, "/test", strings.NewReader(`{"name":"cy"}`), map[string]string{
+		"Content-Type": "application/json",
+	})
+	if err != nil {
+		log.Error(err.Error())
+	}
+	log.Infof("get data:%s", string(request))
 	for i := 0; i < 10; i++ {
 		randLog()
 		time.Sleep(time.Second)
