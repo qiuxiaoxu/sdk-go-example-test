@@ -11,7 +11,10 @@ import (
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
 	"math/rand"
 	"net/http"
+	"os"
+	"os/signal"
 	"strings"
+	"syscall"
 	"time"
 )
 
@@ -87,7 +90,9 @@ func main() {
 		randLog()
 		time.Sleep(time.Second)
 	}
-
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
 }
 
 func test(t []byte) (httpserver.Response, error) {
