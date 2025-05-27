@@ -2,7 +2,7 @@ module sdk-go-example-test
 
 go 1.24.0
 
-require github.com/scrapeless-ai/scrapeless-actor-sdk-go v0.3.1
+require github.com/scrapeless-ai/scrapeless-actor-sdk-go v0.3.2
 
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
