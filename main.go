@@ -29,7 +29,6 @@ var (
 
 func main() {
 	actor = scrapeless.New(scrapeless.WithStorage(), scrapeless.WithServer())
-	actor = scrapeless.New(scrapeless.WithStorage(), scrapeless.WithServer())
 	defer actor.Close()
 	var param = &RequestParam{}
 	if err := actor.Input(param); err != nil {
