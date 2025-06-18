@@ -4,11 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/env"
-	scrapeless "github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/actor"
-	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/httpserver"
 	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/log"
-	"github.com/scrapeless-ai/scrapeless-actor-sdk-go/scrapeless/storage/queue"
+	"github.com/scrapeless-ai/sdk-go/env"
+	"github.com/scrapeless-ai/sdk-go/scrapeless/services/httpserver"
+	"github.com/scrapeless-ai/sdk-go/scrapeless/services/storage/queue"
+
+	scrapeless_actor "github.com/scrapeless-ai/sdk-go/scrapeless/actor"
 	"math/rand"
 	"net/http"
 	"os"
@@ -24,11 +25,12 @@ type RequestParam struct {
 }
 
 var (
-	actor *scrapeless.Actor
+	actor *scrapeless_actor.Actor
 )
 
 func main() {
-	actor = scrapeless.New(scrapeless.WithStorage(), scrapeless.WithServer())
+
+	actor = scrapeless_actor.New()
 	defer actor.Close()
 	var param = &RequestParam{}
 	if err := actor.Input(param); err != nil {
@@ -37,7 +39,7 @@ func main() {
 	}
 	test([]byte(`{"name":"test"}`))
 	for i := 0; i < 10; i++ {
-		msgId, err := actor.Storage.GetQueue().Push(context.Background(), queue.PushQueue{
+		msgId, err := actor.PushMessage(context.Background(), queue.PushQueue{
 			Name:    fmt.Sprintf("%d", i),
 			Payload: []byte(fmt.Sprintf(`{"name":"%s-%d"}`, param.Name, i)),
 		})
@@ -45,12 +47,12 @@ func main() {
 			log.Error(err.Error())
 		}
 		log.Infof("push msgId:%s", msgId)
-		pullResp, err := actor.Storage.GetQueue().Pull(context.Background(), 1)
+		pullResp, err := actor.PullMessage(context.Background(), 1)
 		if err != nil {
 			log.Error(err.Error())
 		}
 		log.Infof("get msgId %s,msg:%+v", pullResp[0].ID, pullResp)
-		err = actor.Storage.GetQueue().Ack(context.Background(), msgId)
+		err = actor.AckMessage(context.Background(), msgId)
 		if err != nil {
 			log.Error(err.Error())
 		}
@@ -113,11 +115,11 @@ func test(t []byte) (httpserver.Response, error) {
 			},
 		}
 		log.Infof("add items: %+v", items)
-		_, err := actor.Storage.GetDataset().AddItems(context.Background(), items)
+		_, err := actor.AddItems(context.Background(), items)
 		if err != nil {
 			log.Error(err.Error())
 		}
-		getItems, err := actor.Storage.GetDataset().GetItems(context.Background(), 1, 10, false)
+		getItems, err := actor.GetItems(context.Background(), 1, 10, false)
 		if err != nil {
 			log.Error(err.Error())
 		}
@@ -127,7 +129,7 @@ func test(t []byte) (httpserver.Response, error) {
 	log.Info("add items success")
 
 	for i := 0; i < 2; i++ {
-		_, err := actor.Storage.GetKv().SetValue(
+		_, err := actor.SetValue(
 			context.Background(),
 			fmt.Sprintf("key-%d", i),
 			fmt.Sprintf("value-%d", i),
@@ -135,7 +137,7 @@ func test(t []byte) (httpserver.Response, error) {
 		if err != nil {
 			log.Errorf("set value err:%v", err)
 		}
-		value, err := actor.Storage.GetKv().GetValue(context.Background(), fmt.Sprintf("key-%d", i))
+		value, err := actor.GetValue(context.Background(), fmt.Sprintf("key-%d", i))
 		if err != nil {
 			log.Errorf("get value err:%v", err)
 		}
